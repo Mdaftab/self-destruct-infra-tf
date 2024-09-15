@@ -23,6 +23,7 @@ resource "google_container_cluster" "primary" {
   release_channel {
     channel = "REGULAR"
   }
+  deletion_protection = false
 }
 
 resource "google_container_node_pool" "primary_nodes" {

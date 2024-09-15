@@ -1,5 +1,5 @@
 #!/bin/bash
-EXPIRATION_DATE="2024-09-18T10:54:13Z"
+EXPIRATION_DATE="2024-09-18T13:35:35Z"
 CURRENT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [[ "$CURRENT_DATE" > "$EXPIRATION_DATE" ]]; then
   echo "Environment has expired. Initiating self-destruct sequence..."
