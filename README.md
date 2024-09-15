@@ -1,5 +1,17 @@
 # GKE Test Cluster Deployment
 
+![BUILT BY](https://img.shields.io/badge/BUILT%20BY-DEVOPS%20ENGINEERS-brightgreen?style=for-the-badge&logo=terraform)
+![BUILT WITH](https://img.shields.io/badge/BUILT%20WITH-%E2%9D%A4-ff69b4?style=for-the-badge&logo=love)
+![BUILT WITH](https://img.shields.io/badge/BUILT%20WITH-TERRAFORM-blueviolet?style=for-the-badge&logo=terraform)
+![MADE WITH](https://img.shields.io/badge/MADE%20WITH-GCP-blue?style=for-the-badge&logo=google-cloud)
+
+![Contributors](https://img.shields.io/github/contributors/yourusername/gke-test-cluster-deployment?style=flat-square)
+![Issues](https://img.shields.io/github/issues/yourusername/gke-test-cluster-deployment?style=flat-square)
+![Pull Requests](https://img.shields.io/github/issues-pr/yourusername/gke-test-cluster-deployment?style=flat-square)
+![Forks](https://img.shields.io/github/forks/yourusername/gke-test-cluster-deployment?style=flat-square)
+![Stars](https://img.shields.io/github/stars/yourusername/gke-test-cluster-deployment?style=flat-square)
+![License](https://img.shields.io/github/license/yourusername/gke-test-cluster-deployment?style=flat-square)
+
 This project contains Terraform configurations to deploy a minimal Google Kubernetes Engine (GKE) cluster on Google Cloud Platform (GCP). It's designed for testing purposes and is optimized for use with GCP's free tier.
 
 ## Table of Contents
