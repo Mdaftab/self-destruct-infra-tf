@@ -1,5 +1,20 @@
 # modules/gke/main.tf
 
+# Cost-Optimization Features:
+# - Uses preemptible nodes (default)
+# - Disabled logging and monitoring services
+# - Uses e2-micro machine type by default
+# - Uses Ubuntu OS for better free tier compatibility
+
+# Security Configuration:
+# - Removes default node pool for better security
+# - Uses minimal OAuth scopes for node service accounts
+# - Configured with separate pod and service CIDR ranges
+
+# Maintenance:
+# - Uses REGULAR release channel for automatic updates
+# - Deletion protection is disabled for easier cleanup
+
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.zone

@@ -1,5 +1,17 @@
 # environments/dev/main.tf
 
+# Project Structure:
+#
+# /environments/
+#   - dev/      # Development environment configuration
+#   - staging/  # Staging environment configuration
+#   - prod/     # Production environment configuration
+#
+# /modules/
+#   - gcp-services/  # Enables required GCP APIs
+#   - vpc/          # VPC and networking configuration
+#   - gke/          # GKE cluster configuration
+
 provider "google" {
   project = var.project_id
   region  = var.region
@@ -37,6 +49,15 @@ module "gke" {
   depends_on = [module.vpc]
 }
 
+# This environment includes a self-destruct mechanism that automatically
+# destroys resources after the specified TTL (default: 72h)
+# Important: Monitor the environment_ttl variable in variables.tf
+
+# Resource Dependencies:
+# 1. GCP Services must be enabled first
+# 2. VPC must be created before GKE cluster
+# 3. GKE cluster must be created before self-destruct mechanism
+
 # Include the self-destruct mechanism
 resource "null_resource" "self_destruct" {
   depends_on = [module.gke]
@@ -68,3 +89,12 @@ resource "null_resource" "self_destruct" {
     command = "crontab -r || true"
   }
 }
+
+# Self-Destruct Features:
+# - Automatically destroys environment after TTL expires
+# - Runs hourly check via crontab
+# - Removes crontab entry on destroy
+# - Uses UTC timestamps for consistency
+#
+# Warning: Ensure proper permissions for terraform destroy
+# command when running in automated mode
