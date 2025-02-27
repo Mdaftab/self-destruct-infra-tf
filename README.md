@@ -1,59 +1,42 @@
-# GKE Test Cluster Deployment
+# Self-Destructing GKE Cluster Infrastructure
 
-[![Made By][made-by-shield]][made-by-url]
-[![Built With][built-with-terraform]][terraform-url]
-[![Built With][built-with-gcp]][gcp-url]
-[![License][license-shield]][license-url]
+A minimal, cost-effective Google Kubernetes Engine (GKE) cluster deployment using Terraform. This project creates a self-destructing cluster optimized for testing and development purposes.
 
-[![HCL][hcl-shield]][shell-url]
-[![Shell][shell-shield]][shell-url]
-
-This project contains Terraform configurations to deploy a minimal Google Kubernetes Engine (GKE) cluster on Google Cloud Platform (GCP). It's designed for testing purposes and is optimized for use with GCP's free tier.
-
-<p align="center">
-  <a href="#prerequisites">Prerequisites</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#project-structure">Structure</a> •
-  <a href="#configuration">Configuration</a> •
-  <a href="#security-notes">Security</a> •
-  <a href="#maintenance">Maintenance</a>
-</p>
-
-## ✨ Features
+## 🎯 Features
 
 <table>
 <tr>
 <td>
 
 ### 🚀 Infrastructure
-- Regional cluster with single-zone deployment
+- Private GKE cluster
 - Custom VPC with dedicated subnets
 - Cloud NAT for internet access
-- Automated node pool management
-- Self-destructing mechanism
+- Spot instances for cost savings
+- Single-zone deployment
 
 ### 💰 Cost Optimization
-- Uses e2-micro machine type
-- Leverages spot instances
-- Minimal node count (1-2 nodes)
-- Optimized resource requests
+- e2-micro machine type
+- Spot instances
+- Minimal node count (1-2)
+- Auto-destruction capability
 
 </td>
 <td>
 
 ### 🔒 Security
-- Private GKE cluster
+- Private cluster
 - VPC-native networking
 - Shielded nodes
 - Limited OAuth scopes
-- Minimal service account permissions
+- Application default credentials
 
 ### 🤖 Automation
-- Automated deployment
-- Self-destruction capability
-- Automated connection setup
+- Two-step deployment process
+- Automated dependency setup
 - Infrastructure as Code
-- CI/CD ready
+- Terraform state management
+- Required APIs auto-enabled
 
 </td>
 </tr>
@@ -61,156 +44,127 @@ This project contains Terraform configurations to deploy a minimal Google Kubern
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have:
-1. A Google Cloud Platform account
-2. Owner or Editor role on your GCP project
-3. Git installed on your machine
-4. Linux/Unix-based operating system
+Before starting, ensure you have:
+- A Google Cloud Platform account
+- Owner or Editor role on your GCP project
+- Git installed
+- Linux/Unix-based operating system
 
-The bootstrap script will automatically install:
-- Terraform >= 1.0
-- Google Cloud SDK
-- kubectl
-- gke-gcloud-auth-plugin
+## 🚀 Deployment Process
 
-## 🚀 Quick Start
+The deployment process is split into two automated scripts for better organization and security:
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/Mdaftab/self-destruct-infra-tf.git
-   cd self-destruct-infra-tf
-   ```
+### 1. Bootstrap Script (`bootstrap.sh`)
 
-2. **Run Bootstrap Script**
-   ```bash
-   sudo ./scripts/bootstrap.sh
-   ```
-   The script will:
-   - Install all required tools
-   - Prompt for your GCP Project ID
-   - Enable required GCP APIs
-   - Create a GCS bucket for Terraform state
-   - Configure terraform.tfvars and backend.tf automatically
+This script handles all prerequisite installations and authentication:
 
-3. **Authenticate with Google Cloud**
-   ```bash
-   gcloud auth application-default login
-   ```
+```bash
+sudo ./scripts/bootstrap.sh
+```
 
-4. **Deploy Infrastructure**
-   ```bash
-   cd environments/dev
-   terraform init
-   terraform plan
-   terraform apply
-   ```
+**What it does:**
+- ✓ Installs required tools:
+  - Terraform
+  - Google Cloud SDK
+  - kubectl
+  - gke-gcloud-auth-plugin
+- ✓ Verifies successful installations
+- ✓ Checks GCP authentication status
+- ✓ Guides through GCP authentication if needed
 
-5. **Connect to Cluster**
-   ```bash
-   ../../scripts/connect.sh
-   ```
+### 2. Setup Script (`setup.sh`)
+
+This script configures and prepares your infrastructure:
+
+```bash
+./scripts/setup.sh
+```
+
+**What it does:**
+- ✓ Verifies GCP authentication
+- ✓ Sets up GCP project configuration
+- ✓ Enables required GCP APIs:
+  - Compute Engine
+  - Kubernetes Engine
+  - Cloud Resource Manager
+  - IAM
+- ✓ Creates GCS bucket for Terraform state
+- ✓ Configures backend.tf with bucket details
+- ✓ Creates terraform.tfvars with your settings
+- ✓ Initializes Terraform
+- ✓ Generates deployment plan
+
+### 3. Deploy Infrastructure
+
+After the setup is complete, deploy your infrastructure:
+
+```bash
+cd environments/dev
+terraform apply tfplan
+```
 
 ## 🏗️ Project Structure
 
 ```
-/gke-project
-├── environments/dev/          # Environment-specific configurations
-│   ├── main.tf               # Main Terraform configuration
-│   ├── variables.tf          # Input variables
-│   ├── outputs.tf            # Output definitions
-│   ├── terraform.tfvars      # Variable values (auto-configured)
-│   └── backend.tf            # Backend configuration (auto-configured)
-├── modules/                   # Reusable Terraform modules
-│   ├── gke/                  # GKE cluster module
-│   └── vpc/                  # VPC network module
-├── kubernetes/               # Kubernetes resources
-│   └── manifests/           # Kubernetes manifest files
-│       ├── deployment.yaml  # Demo application deployment
-│       ├── monitoring.yaml  # Monitoring stack configuration
-│       └── logging.yaml     # Logging stack configuration
-├── scripts/                  # Utility scripts
-│   ├── bootstrap.sh         # Automated setup script
-│   └── connect.sh           # Cluster connection script
-└── README.md
+.
+├── environments/
+│   └── dev/                 # Development environment
+│       ├── backend.tf       # Terraform backend configuration
+│       ├── main.tf         # Main Terraform configuration
+│       ├── variables.tf     # Variable definitions
+│       └── terraform.tfvars # Variable values
+├── modules/                 # Reusable Terraform modules
+│   └── gke/                # GKE cluster module
+└── scripts/
+    ├── bootstrap.sh        # Initial setup script
+    └── setup.sh           # Infrastructure setup script
 ```
 
-## ⚙️ Configuration
+## ⚙️ Infrastructure Details
 
-### 🔧 Automated Setup
-The bootstrap script automatically:
-1. Installs all required tools and dependencies
-2. Creates and configures GCS bucket for Terraform state
-3. Enables required GCP APIs:
-   - compute.googleapis.com
-   - container.googleapis.com
-   - cloudresourcemanager.googleapis.com
-   - iam.googleapis.com
-4. Sets up configuration files with your project details
-
-### 🔒 Sensitive Files
-The following files are automatically configured and should not be committed:
-- `terraform.tfvars`: Contains project-specific variables
-- `backend.tf`: Contains state backend configuration
-- `.terraform.lock.hcl`: Contains provider version locks
-- Any `*.json` credential files
-- `.env` or `.envrc` files
-
-### VPC Configuration
+### Network Configuration
 - Subnet CIDR: `10.0.0.0/24`
 - Pod CIDR: `10.1.0.0/16`
 - Service CIDR: `10.2.0.0/16`
 - Master CIDR: `172.16.0.0/28`
 
-### GKE Configuration
+### Cluster Configuration
 - Machine Type: `e2-micro`
-- Node Pool Size: 1-2 nodes
-- Spot Instances: Enabled
-- Private Cluster: Enabled
-- Regional Deployment: Yes
+- Node Count: 1-2 nodes
+- Node Type: Spot instances
+- Private Cluster: Yes
+- Region: `us-central1`
+- Zone: `us-central1-a`
 
-## 🔐 Security Notes
+## 🔒 Security Notes
 
-1. **Never commit sensitive files:**
+1. **Authentication:**
+   - Uses application default credentials
+   - No service account keys stored locally
+   - Minimal required permissions
+
+2. **Network Security:**
+   - Private cluster deployment
+   - Authorized networks limited to your IP
+   - Secure master access configuration
+
+3. **Never Commit:**
    - Terraform state files (`*.tfstate`)
    - Variable files (`*.tfvars`)
-   - Credentials (`*.json`)
    - Backend configuration (`backend.tf`)
-   - Environment files (`.env`, `.envrc`)
 
-2. Use service accounts with minimal required permissions
-3. Regularly rotate service account keys
-4. Keep your GKE cluster version updated
-5. Monitor cluster logs and metrics
+## 🔧 Maintenance
 
-## 🛠️ Maintenance
+### Updating Configuration
+1. Edit `terraform.tfvars` for changes
+2. Run `terraform plan` to review
+3. Apply with `terraform apply`
 
-### Updating the Cluster
+### Destroying Infrastructure
 ```bash
-# Get latest changes
-git pull
-
-# Plan changes
-terraform plan
-
-# Apply changes
-terraform apply
-```
-
-### Destroying the Infrastructure
-```bash
+cd environments/dev
 terraform destroy
 ```
-
-## ⚠️ Limitations
-
-- e2-micro instances are extremely resource-constrained
-- Limited to lightweight workloads
-- Requires manual resource scaling for complex applications
-- Spot instances may be terminated with short notice
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
@@ -218,13 +172,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [made-by-shield]: https://img.shields.io/badge/Made%20by-Mdaftab-blue
 [made-by-url]: https://github.com/Mdaftab
-[built-with-terraform]: https://img.shields.io/badge/Built%20with-Terraform-purple
-[terraform-url]: https://www.terraform.io/
-[built-with-gcp]: https://img.shields.io/badge/Built%20with-GCP-blue
-[gcp-url]: https://cloud.google.com/
+[built-with-terraform]: https://img.shields.io/badge/Built%20with-Terraform-844fba
+[terraform-url]: https://terraform.io
+[built-with-gcp]: https://img.shields.io/badge/Built%20with-GCP-4285f4
+[gcp-url]: https://cloud.google.com
 [license-shield]: https://img.shields.io/badge/License-MIT-green
 [license-url]: LICENSE
-[hcl-shield]: https://img.shields.io/badge/Language-HCL-blue
-[hcl-url]: https://github.com/hashicorp/hcl
-[shell-shield]: https://img.shields.io/badge/Language-Shell-green
-[shell-url]: https://www.gnu.org/software/bash/
+[hcl-shield]: https://img.shields.io/badge/HCL-38%25-blue
+[shell-shield]: https://img.shields.io/badge/Shell-12%25-green
+[shell-url]: scripts/
