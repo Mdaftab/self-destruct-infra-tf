@@ -110,6 +110,20 @@ fi
 gcloud config set project "$PROJECT_ID"
 print_status "Set project to: $PROJECT_ID"
 
+# Get service account key path
+echo -e "\n${YELLOW}Service Account Configuration${NC}"
+SA_KEY_PATH=$(get_input "Enter the path to your service account key file" "/home/$SUDO_USER/Downloads/${PROJECT_ID}-*.json")
+
+# Verify service account key exists
+if ! [ -f "$SA_KEY_PATH" ]; then
+    print_error "Service account key file not found at: $SA_KEY_PATH"
+    echo -e "\nPlease ensure:"
+    echo "1. You have downloaded the service account key"
+    echo "2. The file path is correct"
+    echo "3. The file exists and is readable"
+    exit 1
+fi
+
 # Create GCS bucket for Terraform state
 BUCKET_NAME="${PROJECT_ID}-tf-state"
 if ! gsutil ls "gs://${BUCKET_NAME}" >/dev/null 2>&1; then
@@ -134,8 +148,9 @@ done
 # Copy and configure example files
 if [ ! -f environments/dev/terraform.tfvars ]; then
     cp environments/dev/terraform.tfvars.example environments/dev/terraform.tfvars
-    # Update project_id in terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/$PROJECT_ID/g" environments/dev/terraform.tfvars
+    # Update project_id and credentials_path in terraform.tfvars
+    sed -i "s|your-project-id|$PROJECT_ID|g" environments/dev/terraform.tfvars
+    sed -i "s|path/to/your/credentials.json|$SA_KEY_PATH|g" environments/dev/terraform.tfvars
     print_status "Created and configured terraform.tfvars"
 else
     print_warning "terraform.tfvars already exists"
@@ -157,6 +172,7 @@ ${GREEN}=== Bootstrap Complete ===${NC}
 
 ${YELLOW}Configuration Summary:${NC}
 - Project ID: ${PROJECT_ID}
+- Service Account Key: ${SA_KEY_PATH}
 - Terraform State Bucket: ${BUCKET_NAME}
 - Required APIs: Enabled
 - Configuration Files: Created and configured
