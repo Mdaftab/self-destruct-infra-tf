@@ -83,8 +83,15 @@ iam.googleapis.com
    ```
 
 2. **Configure Environment**
-   - Copy `environments/dev/terraform.tfvars.example` to `environments/dev/terraform.tfvars`
-   - Update the variables with your GCP project details
+   ```bash
+   # Copy example configuration files
+   cp environments/dev/terraform.tfvars.example environments/dev/terraform.tfvars
+   cp environments/dev/backend.tf.example environments/dev/backend.tf
+   
+   # Edit the files with your configuration
+   vim environments/dev/terraform.tfvars  # Add your project details
+   vim environments/dev/backend.tf        # Configure state backend
+   ```
 
 3. **Deploy Infrastructure**
    ```bash
@@ -112,7 +119,8 @@ iam.googleapis.com
 │   ├── main.tf               # Main Terraform configuration
 │   ├── variables.tf          # Input variables
 │   ├── outputs.tf            # Output definitions
-│   └── terraform.tfvars      # Variable values (create from example)
+│   ├── terraform.tfvars      # Variable values (from example)
+│   └── backend.tf            # Backend configuration (from example)
 ├── modules/                   # Reusable Terraform modules
 │   ├── gke/                  # GKE cluster module
 │   └── vpc/                  # VPC network module
@@ -126,6 +134,16 @@ iam.googleapis.com
 ```
 
 ## ⚙️ Configuration
+
+### 🔒 Sensitive Files
+The following files contain sensitive information and are not tracked in git:
+- `terraform.tfvars`: Contains project-specific variables
+- `backend.tf`: Contains state backend configuration
+- `.terraform.lock.hcl`: Contains provider version locks
+- Any `*.json` credential files
+- `.env` or `.envrc` files
+
+Example files are provided with the `.example` suffix. Copy and modify them for your use.
 
 ### VPC Configuration
 - Subnet CIDR: `10.0.0.0/24`
@@ -142,7 +160,13 @@ iam.googleapis.com
 
 ## 🔐 Security Notes
 
-1. Ensure your `terraform.tfvars` file is never committed to version control
+1. **Never commit sensitive files:**
+   - Terraform state files (`*.tfstate`)
+   - Variable files (`*.tfvars`)
+   - Credentials (`*.json`)
+   - Backend configuration (`backend.tf`)
+   - Environment files (`.env`, `.envrc`)
+
 2. Use service accounts with minimal required permissions
 3. Regularly rotate service account keys
 4. Keep your GKE cluster version updated
