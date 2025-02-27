@@ -84,6 +84,15 @@ get_input() {
     echo "${value:-$default}"
 }
 
+# Check if user is authenticated with Google Cloud
+if ! gcloud auth list --filter=status:ACTIVE --format="get(account)" 2>/dev/null | grep -q "@"; then
+    print_warning "You are not authenticated with Google Cloud. Please authenticate first."
+    echo -e "\nRun the following command to authenticate:"
+    echo -e "${GREEN}gcloud auth login${NC}"
+    echo -e "${GREEN}gcloud auth application-default login${NC}"
+    exit 1
+fi
+
 # Get GCP Project ID
 echo -e "\n${YELLOW}Google Cloud Configuration${NC}"
 PROJECT_ID=$(get_input "Enter your GCP Project ID" "$(gcloud config get-value project 2>/dev/null)")
@@ -91,6 +100,10 @@ PROJECT_ID=$(get_input "Enter your GCP Project ID" "$(gcloud config get-value pr
 # Verify project exists and set it as default
 if ! gcloud projects describe "$PROJECT_ID" >/dev/null 2>&1; then
     print_error "Project $PROJECT_ID does not exist or you don't have access to it"
+    echo -e "\nPlease ensure:"
+    echo "1. The project ID is correct"
+    echo "2. You have access to the project"
+    echo "3. You are properly authenticated with gcloud"
     exit 1
 fi
 
@@ -149,20 +162,13 @@ ${YELLOW}Configuration Summary:${NC}
 - Configuration Files: Created and configured
 
 ${YELLOW}Next Steps:${NC}
-1. Authenticate with Google Cloud:
-   ${GREEN}gcloud auth application-default login${NC}
-
-2. Review your configuration files:
-   - ${YELLOW}environments/dev/terraform.tfvars${NC}
-   - ${YELLOW}environments/dev/backend.tf${NC}
-
-3. Deploy the infrastructure:
+1. Deploy the infrastructure:
    ${GREEN}cd environments/dev
    terraform init
    terraform plan
    terraform apply${NC}
 
-4. Connect to the cluster:
+2. Connect to the cluster:
    ${GREEN}../../scripts/connect.sh${NC}
 
 For more information, see the README.md file.
