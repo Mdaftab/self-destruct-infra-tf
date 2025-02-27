@@ -1,0 +1,16 @@
+# GCP Project Configuration
+project_id        = "your-project-id"
+project_name      = "your-project-name"
+region            = "us-central1"
+zone             = "us-central1-a"
+credentials_path = "path/to/your/credentials.json"
+
+# Network Configuration
+subnet_cidr            = "10.0.0.0/24"
+pod_cidr              = "10.1.0.0/16"
+service_cidr          = "10.2.0.0/16"
+master_ipv4_cidr_block = "172.16.0.0/28"
+authorized_ip         = "YOUR_IP_ADDRESS"  # Your IP address for cluster access
+
+# GKE Configuration
+machine_type = "e2-micro"
