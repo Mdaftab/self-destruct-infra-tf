@@ -10,9 +10,8 @@ terraform {
 
 # Configure providers
 provider "google" {
-  project     = var.project_id
-  region      = var.region
-  credentials = file(var.credentials_path)
+  project = var.project_id
+  region  = var.region
 }
 
 data "google_client_config" "default" {}

@@ -10,11 +10,6 @@ variable "project_name" {
   type        = string
 }
 
-variable "credentials_path" {
-  description = "Path to the GCP service account key file"
-  type        = string
-}
-
 variable "region" {
   description = "The GCP region"
   type        = string

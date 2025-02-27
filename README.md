@@ -5,7 +5,7 @@
 [![Built With][built-with-gcp]][gcp-url]
 [![License][license-shield]][license-url]
 
-[![HCL][hcl-shield]][hcl-url]
+[![HCL][hcl-shield]][shell-url]
 [![Shell][shell-shield]][shell-url]
 
 This project contains Terraform configurations to deploy a minimal Google Kubernetes Engine (GKE) cluster on Google Cloud Platform (GCP). It's designed for testing purposes and is optimized for use with GCP's free tier.
@@ -61,39 +61,43 @@ This project contains Terraform configurations to deploy a minimal Google Kubern
 
 ## 📋 Prerequisites
 
+Before you begin, ensure you have:
+1. A Google Cloud Platform account
+2. Owner or Editor role on your GCP project
+3. Git installed on your machine
+4. Linux/Unix-based operating system
+
+The bootstrap script will automatically install:
 - Terraform >= 1.0
 - Google Cloud SDK
 - kubectl
 - gke-gcloud-auth-plugin
 
-Required GCP APIs:
-```bash
-compute.googleapis.com
-container.googleapis.com
-cloudresourcemanager.googleapis.com
-iam.googleapis.com
-```
-
 ## 🚀 Quick Start
 
-1. **Setup GCP Project**
+1. **Clone the Repository**
    ```bash
-   # Run the bootstrap script to install prerequisites
-   ./scripts/bootstrap.sh
+   git clone https://github.com/Mdaftab/self-destruct-infra-tf.git
+   cd self-destruct-infra-tf
    ```
 
-2. **Configure Environment**
+2. **Run Bootstrap Script**
    ```bash
-   # Copy example configuration files
-   cp environments/dev/terraform.tfvars.example environments/dev/terraform.tfvars
-   cp environments/dev/backend.tf.example environments/dev/backend.tf
-   
-   # Edit the files with your configuration
-   vim environments/dev/terraform.tfvars  # Add your project details
-   vim environments/dev/backend.tf        # Configure state backend
+   sudo ./scripts/bootstrap.sh
+   ```
+   The script will:
+   - Install all required tools
+   - Prompt for your GCP Project ID
+   - Enable required GCP APIs
+   - Create a GCS bucket for Terraform state
+   - Configure terraform.tfvars and backend.tf automatically
+
+3. **Authenticate with Google Cloud**
+   ```bash
+   gcloud auth application-default login
    ```
 
-3. **Deploy Infrastructure**
+4. **Deploy Infrastructure**
    ```bash
    cd environments/dev
    terraform init
@@ -101,14 +105,9 @@ iam.googleapis.com
    terraform apply
    ```
 
-4. **Connect to Cluster**
+5. **Connect to Cluster**
    ```bash
-   ./scripts/connect.sh
-   ```
-
-5. **Deploy Demo Application** (Optional)
-   ```bash
-   kubectl apply -f kubernetes/manifests/deployment.yaml
+   ../../scripts/connect.sh
    ```
 
 ## 🏗️ Project Structure
@@ -119,31 +118,42 @@ iam.googleapis.com
 │   ├── main.tf               # Main Terraform configuration
 │   ├── variables.tf          # Input variables
 │   ├── outputs.tf            # Output definitions
-│   ├── terraform.tfvars      # Variable values (from example)
-│   └── backend.tf            # Backend configuration (from example)
+│   ├── terraform.tfvars      # Variable values (auto-configured)
+│   └── backend.tf            # Backend configuration (auto-configured)
 ├── modules/                   # Reusable Terraform modules
 │   ├── gke/                  # GKE cluster module
 │   └── vpc/                  # VPC network module
 ├── kubernetes/               # Kubernetes resources
 │   └── manifests/           # Kubernetes manifest files
-│       └── deployment.yaml  # Demo application deployment
+│       ├── deployment.yaml  # Demo application deployment
+│       ├── monitoring.yaml  # Monitoring stack configuration
+│       └── logging.yaml     # Logging stack configuration
 ├── scripts/                  # Utility scripts
-│   ├── bootstrap.sh         # Setup script
+│   ├── bootstrap.sh         # Automated setup script
 │   └── connect.sh           # Cluster connection script
 └── README.md
 ```
 
 ## ⚙️ Configuration
 
+### 🔧 Automated Setup
+The bootstrap script automatically:
+1. Installs all required tools and dependencies
+2. Creates and configures GCS bucket for Terraform state
+3. Enables required GCP APIs:
+   - compute.googleapis.com
+   - container.googleapis.com
+   - cloudresourcemanager.googleapis.com
+   - iam.googleapis.com
+4. Sets up configuration files with your project details
+
 ### 🔒 Sensitive Files
-The following files contain sensitive information and are not tracked in git:
+The following files are automatically configured and should not be committed:
 - `terraform.tfvars`: Contains project-specific variables
 - `backend.tf`: Contains state backend configuration
 - `.terraform.lock.hcl`: Contains provider version locks
 - Any `*.json` credential files
 - `.env` or `.envrc` files
-
-Example files are provided with the `.example` suffix. Copy and modify them for your use.
 
 ### VPC Configuration
 - Subnet CIDR: `10.0.0.0/24`
@@ -200,30 +210,21 @@ terraform destroy
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-For support and questions, please open an issue in the repository.
-
-<!-- MARKDOWN LINKS & BADGES -->
-[made-by-shield]: https://img.shields.io/badge/MADE_BY-DEVOPS_ENGINEERS-blue?style=for-the-badge
-[made-by-url]: #
-[built-with-terraform]: https://img.shields.io/badge/BUILT_WITH-TERRAFORM-purple?style=for-the-badge
+[made-by-shield]: https://img.shields.io/badge/Made%20by-Mdaftab-blue
+[made-by-url]: https://github.com/Mdaftab
+[built-with-terraform]: https://img.shields.io/badge/Built%20with-Terraform-purple
 [terraform-url]: https://www.terraform.io/
-[built-with-gcp]: https://img.shields.io/badge/BUILT_WITH-GCP-blue?style=for-the-badge
+[built-with-gcp]: https://img.shields.io/badge/Built%20with-GCP-blue
 [gcp-url]: https://cloud.google.com/
-[license-shield]: https://img.shields.io/badge/LICENSE-MIT-green?style=for-the-badge
-[license-url]: ./LICENSE
-[hcl-shield]: https://img.shields.io/badge/HCL-90%25-brightgreen?style=flat-square
-[hcl-url]: #
-[shell-shield]: https://img.shields.io/badge/Shell-10%25-yellow?style=flat-square
-[shell-url]: #
+[license-shield]: https://img.shields.io/badge/License-MIT-green
+[license-url]: LICENSE
+[hcl-shield]: https://img.shields.io/badge/Language-HCL-blue
+[hcl-url]: https://github.com/hashicorp/hcl
+[shell-shield]: https://img.shields.io/badge/Language-Shell-green
+[shell-url]: https://www.gnu.org/software/bash/

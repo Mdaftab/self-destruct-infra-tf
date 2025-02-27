@@ -3,7 +3,6 @@ project_id        = "your-project-id"
 project_name      = "your-project-name"
 region            = "us-central1"
 zone             = "us-central1-a"
-credentials_path = "path/to/your/credentials.json"
 
 # Network Configuration
 subnet_cidr            = "10.0.0.0/24"
